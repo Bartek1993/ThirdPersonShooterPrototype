@@ -133,6 +133,7 @@ public class Fox_Controller : MonoBehaviour
 
                     EnemyScript object_script = hit.transform.GetComponent<EnemyScript>();
                     object_script.TakeDamage(weapon_damage);
+                    object_script.EnemyAI(1,aim,shoot);
                   
                 }
 

@@ -12,6 +12,8 @@ public class EnemyScript : MonoBehaviour
     public CharacterController EnemyMainController;
     public int enemy_health;
     public int enemy_AI;
+    [SerializeField]
+    GameObject Player;
 
 
 
@@ -21,6 +23,7 @@ public class EnemyScript : MonoBehaviour
         ragdoll_rigid = GetComponentsInChildren<Rigidbody>();
         rigid_colliders = GetComponentsInChildren<CapsuleCollider>();
         OnDisableRagdoll();
+        Player = GameObject.FindGameObjectWithTag("Player");
         
         
     }
@@ -38,20 +41,24 @@ public class EnemyScript : MonoBehaviour
 
     }
 
-    private void EnemyAI(int AI, bool player_is_aiming, bool player_is_shooting)
+    public void EnemyAI(int AI, bool player_is_aiming, bool player_is_shooting)
     {
+
+
+        float distance = Vector3.Distance(gameObject.transform.position, Player.transform.position);
+        gameObject.transform.LookAt(new Vector3(Player.transform.position.x,gameObject.transform.position.y,Player.transform.position.z));
         enemy_AI = AI;
-        if (player_is_aiming)
+        if (player_is_aiming )
         {
+            
+            float horizontal = UnityEngine.Random.Range(-0.9f, 1f);
             switch (AI)
-            {
+            { 
                 case 1:
+                    animator.SetFloat("InputHorizontal", horizontal );
+                    gameObject.transform.Translate(new Vector3(horizontal,0,0) * 20f * Time.deltaTime);
 
-                    break;
-
-                case 2:
-
-                    break;
+                    break;     
             }
         }
         else 
