@@ -89,7 +89,7 @@ public class Fox_Controller : MonoBehaviour
     void Update()
     {
         /*
-         * set cursror properties 
+         * set cursror properties  
          * */
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -125,12 +125,17 @@ public class Fox_Controller : MonoBehaviour
                     
                     env_object_script object_script = hit.transform.GetComponent<env_object_script>();
                     object_script.TakeDamage(weapon_damage);
-                    if (hit.rigidbody != null) 
-                    {
-                        Rigidbody rb = hit.rigidbody;
-                        rigidBody.AddExplosionForce(500, new Vector3(50, 30, 50), 50);
-                    }
+                  
                 }
+
+                if (hit.transform.tag == "enemy")
+                {
+
+                    EnemyScript object_script = hit.transform.GetComponent<EnemyScript>();
+                    object_script.TakeDamage(weapon_damage);
+                  
+                }
+
 
                 if (hit.transform.tag == "barrel")
                 {
@@ -140,7 +145,15 @@ public class Fox_Controller : MonoBehaviour
                 {
                     Instantiate(impact, hit.point, Quaternion.identity);
                 }
+               
+                
+                
+                if (hit.rigidbody != null || hit.transform.GetComponentsInChildren<Rigidbody>() != null)
+                {
 
+                    Debug.Log("RIGID HITTT");
+                    hit.rigidbody.AddForce(-hit.normal * 350f);
+                }
             }
         }
     }
@@ -311,7 +324,7 @@ public class Fox_Controller : MonoBehaviour
             ThirdPersonCamera.m_RecenterToTargetHeading.m_enabled = false;
             ThirdPersonCamera.m_RecenterToTargetHeading.m_RecenteringTime = 0f;
             ThirdPersonCamera.m_RecenterToTargetHeading.m_WaitTime = 0f;
-            ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.z = 3.1f + camera_x_shoot_offset;
+            ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.z = 2.1f + camera_x_shoot_offset;
             ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.x = .45f + camera_y_shoot_offset;
             ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.y = 0f + camera_z_shoot_offset;
             ThirdPersonCamera.m_XAxis.m_MinValue = -180f;

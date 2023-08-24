@@ -7,7 +7,7 @@ public class env_object_script : MonoBehaviour
     [SerializeField]
     int hp;
     [SerializeField]
-    GameObject broken_model, explosion;
+    GameObject broken_model, explosion, explosionRadius;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,6 +32,8 @@ public class env_object_script : MonoBehaviour
             GameObject brokenModel = Instantiate(broken_model,gameObject.transform.position,Quaternion.identity);
             GameObject explosion_object = Instantiate(explosion,gameObject.transform.position,Quaternion.identity);
             explosion.transform.parent = null;
+            GameObject explosionrad = Instantiate(explosionRadius, gameObject.transform.position, Quaternion.identity);
+            Destroy(explosionrad, 0.05f);
             Destroy(explosion_object, 20);
             Destroy(gameObject,.1f);
             
