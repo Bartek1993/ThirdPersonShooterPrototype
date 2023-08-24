@@ -8,9 +8,12 @@ public class env_object_script : MonoBehaviour
     int hp;
     [SerializeField]
     GameObject broken_model, explosion, explosionRadius;
+    [SerializeField]
+    Rigidbody rb;
     // Start is called before the first frame update
     void Start()
     {
+        rb = GetComponent<Rigidbody>();
         hp = 10;
     }
 
@@ -33,10 +36,17 @@ public class env_object_script : MonoBehaviour
             GameObject explosion_object = Instantiate(explosion,gameObject.transform.position,Quaternion.identity);
             explosion.transform.parent = null;
             GameObject explosionrad = Instantiate(explosionRadius, gameObject.transform.position, Quaternion.identity);
-            Destroy(explosionrad, 0.05f);
+            Destroy(explosionrad, 0.2f);
             Destroy(explosion_object, 20);
             Destroy(gameObject,.1f);
             
         };
+    }
+
+
+
+    public void onExplosion() 
+    {
+        rb.AddForce(new Vector3(100,100,100));
     }
 }

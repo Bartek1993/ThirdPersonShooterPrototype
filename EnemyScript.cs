@@ -74,4 +74,13 @@ public class EnemyScript : MonoBehaviour
         }
 
     }
+
+
+    public void onExplosion() 
+    {
+        foreach (Rigidbody rb in ragdoll_rigid)
+        {
+            rb.AddExplosionForce(30, new Vector3(100, 1000, 100), 20);
+        }
+    }
 }
