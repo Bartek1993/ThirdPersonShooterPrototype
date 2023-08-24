@@ -36,8 +36,8 @@ public class env_object_script : MonoBehaviour
             GameObject explosion_object = Instantiate(explosion,gameObject.transform.position,Quaternion.identity);
             explosion.transform.parent = null;
             GameObject explosionrad = Instantiate(explosionRadius, gameObject.transform.position, Quaternion.identity);
-            Destroy(explosionrad, 0.2f);
-            Destroy(explosion_object, 20);
+            Destroy(explosionrad, .4f);
+            Destroy(explosion_object, 5);
             Destroy(gameObject,.1f);
             
         };

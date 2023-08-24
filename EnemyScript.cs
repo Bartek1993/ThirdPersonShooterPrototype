@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +11,7 @@ public class EnemyScript : MonoBehaviour
     public CapsuleCollider[] rigid_colliders;
     public CharacterController EnemyMainController;
     public int enemy_health;
+    public int enemy_AI;
 
 
 
@@ -29,7 +31,35 @@ public class EnemyScript : MonoBehaviour
         if (enemy_health <= 0) 
         {
             OnEnableRagdoll();
+            Destroy(gameObject, 10);
         }
+
+        
+
+    }
+
+    private void EnemyAI(int AI, bool player_is_aiming, bool player_is_shooting)
+    {
+        enemy_AI = AI;
+        if (player_is_aiming)
+        {
+            switch (AI)
+            {
+                case 1:
+
+                    break;
+
+                case 2:
+
+                    break;
+            }
+        }
+        else 
+        {
+            AI = 0;
+        }
+        
+        
     }
 
     public void TakeDamage(int damage) 
@@ -62,7 +92,7 @@ public class EnemyScript : MonoBehaviour
     {
         foreach (Rigidbody rb in ragdoll_rigid)
         {
-            EnemyMainController.enabled = false;
+            EnemyMainController.enabled = true;
             animator.enabled = false;
             rb.isKinematic = false;
             rb.mass = 0.01f;
@@ -70,7 +100,8 @@ public class EnemyScript : MonoBehaviour
 
         foreach (CapsuleCollider col in rigid_colliders)
         {
-            col.enabled = true;
+
+            StartCoroutine("disable_col");
         }
 
     }
@@ -82,5 +113,20 @@ public class EnemyScript : MonoBehaviour
         {
             rb.AddExplosionForce(30, new Vector3(100, 1000, 100), 20);
         }
+        
+        //
+    }
+
+
+    IEnumerator disable_col() 
+    {
+        yield return new WaitForSeconds(.2f);
+        EnemyMainController.enabled = false;
+        foreach (CapsuleCollider col in rigid_colliders)
+        {
+            col.enabled = true;
+
+        }
+        
     }
 }

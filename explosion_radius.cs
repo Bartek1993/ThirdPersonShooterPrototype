@@ -46,10 +46,7 @@ public class explosion_radius : MonoBehaviour
 
     public void OnTriggerStay(Collider other)
     {
-        if (other.transform.GetComponent<Rigidbody>() != null)
-        {
-            other.attachedRigidbody.AddExplosionForce(500, new Vector3(200, 1000, 200), 20);
-        }
+       
 
         if (other.transform.tag == "barrel")
         {
