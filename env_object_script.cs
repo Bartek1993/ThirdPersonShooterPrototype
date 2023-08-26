@@ -14,7 +14,7 @@ public class env_object_script : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        hp = 10;
+        hp = UnityEngine.Random.Range(5,10);
     }
 
     // Update is called once per frame
@@ -36,8 +36,8 @@ public class env_object_script : MonoBehaviour
             GameObject explosion_object = Instantiate(explosion,gameObject.transform.position,Quaternion.identity);
             explosion.transform.parent = null;
             GameObject explosionrad = Instantiate(explosionRadius, gameObject.transform.position, Quaternion.identity);
-            Destroy(explosionrad, .4f);
-            Destroy(explosion_object, 5);
+            Destroy(explosionrad, .2f);
+            Destroy(explosion_object, 15);
             Destroy(gameObject,.1f);
             
         };

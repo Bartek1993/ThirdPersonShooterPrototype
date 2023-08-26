@@ -46,19 +46,5 @@ public class explosion_radius : MonoBehaviour
 
     public void OnTriggerStay(Collider other)
     {
-       
-
-        if (other.transform.tag == "barrel")
-        {
-            env_object_script object_barrel = other.transform.GetComponent<env_object_script>();
-            object_barrel.onExplosion();
-
-        }
-        if (other.transform.tag == "enemy")
-        {
-            EnemyScript object_enemy = other.transform.GetComponent<EnemyScript>();
-            object_enemy.onExplosion();
-
-        }
     }
 }

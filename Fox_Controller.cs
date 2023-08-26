@@ -21,8 +21,7 @@ public class Fox_Controller : MonoBehaviour
     Vector3 movement;
     [SerializeField]
     Animator animator;
-    [SerializeField]
-    bool aim, run, slash, shoot, aim_weapon, shoot_weapon;
+    public bool aim, run, slash, shoot, aim_weapon, shoot_weapon;
     [SerializeField]
     CinemachineFreeLook ThirdPersonCamera;
     [SerializeField]
@@ -42,7 +41,7 @@ public class Fox_Controller : MonoBehaviour
     [SerializeField]
     GameObject[] weapon_models;
     [SerializeField]
-    GameObject croshair_object;
+    GameObject crosshair_dot;
     [SerializeField]
     Texture croshair;
     [SerializeField]
@@ -67,6 +66,10 @@ public class Fox_Controller : MonoBehaviour
     GameObject muzzle, muzzle_position, smoke, impact, impact_barell;
     [SerializeField]
     float camera_x_shoot_offset, camera_y_shoot_offset, camera_z_shoot_offset;
+    [SerializeField]
+    RaycastHit hit;
+    [SerializeField]
+    Ray ray;
 
     // Start is called before the first frame update
     void Start()
@@ -99,6 +102,7 @@ public class Fox_Controller : MonoBehaviour
         setAnimator();
         CinemachineCameraOptions();
         setRigsForWeapons();
+        setRigsForBody();
         setWeaponID();
         setCH();
         setWeaponModel();
@@ -106,57 +110,73 @@ public class Fox_Controller : MonoBehaviour
         Shooting();
     }
 
-    private void Shooting()
+    private void setRigsForBody()
     {
-        RaycastHit hit;
-        Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
-        if (aim && shoot && Time.time > nextFire) 
+        if (aim || shoot)
         {
-            StartCoroutine("Shooting_Weapon");
-            nextFire = Time.time + weapon_speed;
-            if (Physics.Raycast(ray, out hit)) 
+            for (var b = 0; b < body_rigs.Length; b++)
             {
-                Debug.Log("Shot from: " + weapon_name);
-                Debug.Log("You shot: " + hit.transform.name);
-               
-
-                if (hit.transform.tag == "barrel") 
-                {
-                    
-                    env_object_script object_script = hit.transform.GetComponent<env_object_script>();
-                    object_script.TakeDamage(weapon_damage);
-                  
-                }
-
-                if (hit.transform.tag == "enemy")
-                {
-
-                    EnemyScript object_script = hit.transform.GetComponent<EnemyScript>();
-                    object_script.TakeDamage(weapon_damage);
-                    object_script.EnemyAI(1,aim,shoot);
-                  
-                }
-
-
-                if (hit.transform.tag == "barrel")
-                {
-                    Instantiate(impact_barell, hit.point, Quaternion.identity);
-                }
-                else 
-                {
-                    Instantiate(impact, hit.point, Quaternion.identity);
-                }
-               
-                
-                
-                if (hit.rigidbody != null || hit.transform.GetComponentsInChildren<Rigidbody>() != null)
-                {
-
-                    Debug.Log("RIGID HITTT");
-                    hit.rigidbody.AddForce(-hit.normal * 350f);
-                }
+                body_rigs[b].weight = 1f;
             }
         }
+        else
+        {
+            for (var b = 0; b < body_rigs.Length; b++)
+            {
+                body_rigs[b].weight = 0.25f;
+            }
+        }
+    }
+
+    private void Shooting()
+    {
+
+        ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+        
+       
+
+        if (Physics.Raycast(ray, out hit)) 
+        {
+
+                Debug.Log("Shot from: " + weapon_name);
+                Debug.Log("You shot: " + hit.transform.name);
+        }
+
+        if (shoot && Time.time > nextFire)
+        {
+            nextFire = Time.time + weapon_speed;
+            StartCoroutine("Shooting_Weapon");
+            if (hit.transform.tag == "barrel")
+            {
+
+                env_object_script object_script = hit.transform.GetComponent<env_object_script>();
+                object_script.TakeDamage(weapon_damage);
+
+            }
+            if (hit.transform.tag == "enemy")
+            {
+
+                EnemyScript object_script = hit.transform.GetComponent<EnemyScript>();
+                object_script.TakeDamage(weapon_damage);
+                object_script.EnemyAI(1, aim, shoot);
+
+            }
+            if (hit.transform.tag == "barrel")
+            {
+                Instantiate(impact_barell, hit.point, Quaternion.identity);
+            }
+            else
+            {
+                Instantiate(impact, hit.point, Quaternion.identity);
+            }
+            if (hit.rigidbody != null || hit.transform.GetComponentsInChildren<Rigidbody>() != null)
+            {
+
+                Debug.Log("RIGID HITTT");
+                hit.rigidbody.AddForce(-hit.normal * 350f);
+            }
+        }
+
     }
 
     public void GetCurrentWeaponProperties()
@@ -204,16 +224,16 @@ public class Fox_Controller : MonoBehaviour
     {
 
         croshair_image.texture = croshair;
-
         if (aim)
         {
-            croshair_object.SetActive(true);
-
+            crosshair_dot.SetActive(true);
         }
         else 
         {
-            croshair_object.SetActive(false);
+            crosshair_dot.SetActive(false);
         }
+
+        
     }
 
     private void setWeaponID()
@@ -325,17 +345,15 @@ public class Fox_Controller : MonoBehaviour
             ThirdPersonCamera.m_RecenterToTargetHeading.m_enabled = false;
             ThirdPersonCamera.m_RecenterToTargetHeading.m_RecenteringTime = 0f;
             ThirdPersonCamera.m_RecenterToTargetHeading.m_WaitTime = 0f;
-            ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.z = 2.1f + camera_x_shoot_offset;
-            ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.x = .45f + camera_y_shoot_offset;
+            ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.z += .05f + camera_x_shoot_offset;
+            ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.x += .05f + camera_y_shoot_offset;
             ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.y = 0f + camera_z_shoot_offset;
             ThirdPersonCamera.m_XAxis.m_MinValue = -180f;
             ThirdPersonCamera.m_XAxis.m_MaxValue = 180f;
             ThirdPersonCamera.m_XAxis.m_Wrap = true;
-            for (var b = 0; b < body_rigs.Length; b++)
-            {
-                body_rigs[b].weight = 1f;
-            }
-           
+            
+
+            
 
         }
         else 
@@ -350,12 +368,18 @@ public class Fox_Controller : MonoBehaviour
             ThirdPersonCamera.m_XAxis.m_MinValue = -180f;
             ThirdPersonCamera.m_XAxis.m_MaxValue = 180f;
             ThirdPersonCamera.m_XAxis.m_Wrap = true;
-            for (var b = 0; b < body_rigs.Length; b++)
-            {
-                body_rigs[b].weight = 0.25f;
-            }
+         
           
         }
+
+
+     
+
+        //SMOOTH CAMERA///
+        if (ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.z > 2.65) { ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.z = 2.65f; }
+        if (ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.x > .05) { ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.x = .05f; }
+        //if (ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.z == 0) { ThirdPersonCamera.GetComponent<CinemachineCameraOffset>().m_Offset.z = 0f; }
+
     }
 
     private void setAnimator()
@@ -384,23 +408,22 @@ public class Fox_Controller : MonoBehaviour
         z = Input.GetAxis("Vertical");
         movement = new Vector3 (x, y, z);
         aim = Input.GetKey(KeyCode.Mouse1);
+        //aim = true;
         shoot = Input.GetKey(KeyCode.Mouse0);
         aim_weapon = Input.GetKey(KeyCode.Mouse1);
         shoot_weapon = Input.GetKey(KeyCode.Mouse0);
-
-
         run = Input.GetKey(KeyCode.LeftShift);
         if (run && movement.magnitude >0.1f)
         {
             aim = false;
             shoot = false;
-            speed = 4f;
+            speed = 5f;
            
         }
         else 
         {
             
-            speed = 1.5f;
+            speed = 2f;
         }
     }
 
@@ -427,7 +450,7 @@ public class Fox_Controller : MonoBehaviour
         {
             //MOVE RIGIDBODY
             
-            rigidBody.velocity = new Vector3(movement.x * speed, rigidBody.velocity.y, movement.z * speed);
+            rigidBody.velocity = new Vector3(movement.x, 0 , movement.z) * speed;
             gameObject.transform.LookAt(null);
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movement), .6f);
         }
@@ -438,6 +461,7 @@ public class Fox_Controller : MonoBehaviour
             //transform.Rotate(new Vector3(0,Input.GetAxis("Mouse X"),0) * 200 * Time.fixedDeltaTime);
             gameObject.transform.LookAt(new Vector3(target.transform.position.x, transform.position.y, target.transform.position.z));
         }
+        else { }
 
 
     }
@@ -458,7 +482,7 @@ public class Fox_Controller : MonoBehaviour
         muzzle_inst.gameObject.transform.parent = null;
         camera_x_shoot_offset = 0.00f;
         camera_y_shoot_offset = 0.00f;
-        camera_z_shoot_offset = 0.01f;
+        camera_z_shoot_offset = 0.02f;
         yield return new WaitForSeconds(.12f);
         Destroy(muzzle_inst);
         camera_x_shoot_offset = 0.0f;
